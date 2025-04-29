@@ -11,10 +11,10 @@ tree 알고리즘으로 미로생성 및 탈출게임</b1>
 
 
 # 개발 환경
-○ Unity 2022.3.30f1
-○ c#
-○ Window
-
-
+○ Unity 2022.3.30f1  
+○ c#  
+○ Window  
+    
+  
 # 소개 및 플레이영상
 ![Image](https://github.com/user-attachments/assets/5ef6ec98-9a74-488e-9c02-e5bb965fa5d4)
