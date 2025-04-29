@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
     private bool isRunning = true;
     private static GameManager instance;
     private bool isFirstInstance = true;
+    private bool quitGame = false;
 
     string endTime;
     void Awake()
@@ -44,39 +45,57 @@ public class GameManager : MonoBehaviour
 
     public void LevelSelect(int value)
     {
+        quitGame = false;
         gameLevel = value;
         StartCoroutine(LoadSceneAsync("Maze"));
     }
 
     public void Timer(Text texts)
     {
+        endTime = "";
         StartCoroutine(UpdateTimerRoutine(texts));
     }
 
     IEnumerator UpdateTimerRoutine(Text timerText)
     {
+        int h=0;
+        int m=0;
+        int s=0;
+
         while (isRunning)
         {
             // elapsedTime 누적
             elapsedTime += updateInterval;
 
             // 포맷팅
-            int h = Mathf.FloorToInt(elapsedTime / 3600f);
-            int m = Mathf.FloorToInt((elapsedTime % 3600f) / 60f);
-            int s = Mathf.FloorToInt(elapsedTime % 60f);
+            h = Mathf.FloorToInt(elapsedTime / 3600f);
+            m = Mathf.FloorToInt((elapsedTime % 3600f) / 60f);
+            s = Mathf.FloorToInt(elapsedTime % 60f);
 
             timerText.text = $"{h:00}:{m:00}:{s:00}";
 
-            if (h == 00)
-            {
-                endTime = m + "분 " + s + " 초";
-            }
-            else
-            {
-                endTime = h + "시간 " + m + "분 " + s + " 초";
-            }
+            
+            
             yield return new WaitForSeconds(updateInterval);
         }
+        if (h != 00)
+        {
+            endTime = h + " 시간";
+        }
+        if (m != 00)
+        {
+            endTime += m + " 분";
+        }
+        if (s != 00)
+        {
+            endTime += s + " 초";
+        }
+        if (!quitGame)
+        {
+            popupPanel.PopupBtnSet(1, () => StartCoroutine(LoadSceneAsync("Lobby")));
+            popupPanel.Open("~탈출 성공~\n\n미로를 " + endTime + "에 탈출하였습니다.", "확인");
+        }
+       
     }
 
     public void StopTimer() => isRunning = false;
@@ -104,11 +123,11 @@ public class GameManager : MonoBehaviour
     public void GameEnd()
     {
         StopTimer();
-        popupPanel.PopupBtnSet(1, () => StartCoroutine(LoadSceneAsync("Lobby")));
-        popupPanel.Open("~탈출 성공~\n\n미로를 " + endTime + "에 탈출하였습니다.", "확인");
+       
 
     }
 
+    public void QuitGame() => quitGame = true;
 
     public void Exit()
     {
@@ -121,6 +140,7 @@ public class GameManager : MonoBehaviour
         {
             popupPanel.PopupBtnSet(0, () => StartCoroutine(LoadSceneAsync("Lobby")));
             popupPanel.PopupBtnSet(0, StopTimer);
+            popupPanel.PopupBtnSet(0, QuitGame);
             popupPanel.Open("메인 화면으로 이동하시겠습니까?", "네", "아니오");
         }
 
